@@ -21,7 +21,6 @@ export class UserService {
       const users = await prisma.user.findMany({
         include: {
           roles: true,
-          agents: true,
         },
       });
       return {
@@ -203,13 +202,6 @@ export class UserService {
         where: { id },
         include: {
           roles: true,
-          likes: true,
-          testimonials: true,
-          agents: {
-            include: {
-              agentReviews: true,
-            },
-          },
         },
       });
 
@@ -218,33 +210,6 @@ export class UserService {
       }
 
       await prisma.$transaction(async (tx) => {
-        // Delete the user's likes
-        await tx.likes.deleteMany({
-          where: { userId: id },
-        });
-
-        // Delete the user's testimonials
-        await tx.testimony.deleteMany({
-          where: { userId: id },
-        });
-
-        // Delete the user's agent reviews if they exist
-        for (const agent of user.agents) {
-          if (agent.agentReviews) {
-            await tx.agentReview.delete({
-              where: { id: agent.agentReviews.id },
-            });
-          }
-        }
-
-        // Delete the user's agent records
-        if (user.agents.length > 0) {
-          await tx.agents.deleteMany({
-            where: { userId: id },
-          });
-        }
-
-        // Delete the user's roles
         await tx.userRoles.deleteMany({
           where: { userId: id },
         });
