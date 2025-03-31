@@ -1,4 +1,4 @@
-import type { $Enums } from "@prisma/client";
+import type { $Enums, Prisma } from "@prisma/client";
 import { TsoaResponse } from "tsoa";
 import { VideoStatus, Role } from "@prisma/client";
 
@@ -94,7 +94,7 @@ export interface IVideo {
   createdAt: Date;
   updatedAt: Date;
   userId: string;
-  metadata?: Record<string, unknown> | null;
+  metadata?: Prisma.JsonValue | null;
 }
 
 export interface CreateVideoDto {
@@ -103,7 +103,7 @@ export interface CreateVideoDto {
   thumbnail?: Express.Multer.File | string;
   url: Express.Multer.File | string;
   userId: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Prisma.InputJsonValue;
 }
 
 export interface UpdateVideoDto extends Partial<CreateVideoDto> {

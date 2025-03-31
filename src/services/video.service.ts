@@ -32,6 +32,7 @@ export class VideoService {
           typeof videoData.thumbnail === "string" ? videoData.thumbnail : "",
         userId,
         status: "UPLOADED",
+        metadata: videoData.metadata ? videoData.metadata : Prisma.JsonNull,
       },
       include: this.videoIncludes,
     });
@@ -65,7 +66,7 @@ export class VideoService {
   static async updateVideoStatus(
     videoId: string,
     status: VideoStatusT,
-    metadata?: Record<string, unknown>,
+    metadata?: Prisma.InputJsonValue,
   ): Promise<IVideo> {
     return prisma.video.update({
       where: { id: videoId },

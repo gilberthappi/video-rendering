@@ -28,7 +28,7 @@ import {
   processVideoUpload,
   handleVideoUpload,
 } from "../middlewares/videoUpload.middleware";
-
+import { Prisma } from "@prisma/client";
 @Tags("Video Processing")
 @Route("videos")
 export class VideoController {
@@ -98,7 +98,7 @@ export class VideoController {
   @Response<{ error: string }>(500, "Internal Server Error")
   public async updateStatus(
     @Path() id: string,
-    @Body() body: { status: VideoStatus; metadata?: Record<string, unknown> },
+    @Body() body: { status: VideoStatus; metadata?: Prisma.InputJsonValue },
   ): Promise<IVideo> {
     return VideoService.updateVideoStatus(id, body.status, body.metadata);
   }
