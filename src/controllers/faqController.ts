@@ -25,7 +25,7 @@ export class FaqController {
   }
 
   @Get("/{id}")
-  public async getContact(@Path() id: number): Promise<IResponse<TFaq | null>> {
+  public async getContact(@Path() id: string): Promise<IResponse<TFaq | null>> {
     return FaqService.getFaq(id);
   }
 
@@ -40,14 +40,14 @@ export class FaqController {
 
   @Put("/{id}")
   public async updateContact(
-    @Path() id: number,
+    @Path() id: string,
     @Body() faqData: Partial<CreateFaqDto>,
   ): Promise<IResponse<TFaq | null>> {
     return FaqService.updateFaq(id, faqData);
   }
 
   @Delete("/{id}")
-  public async deleteContact(@Path() id: number): Promise<IResponse<null>> {
+  public async deleteContact(@Path() id: string): Promise<IResponse<null>> {
     await FaqService.deleteFaq(id);
     return {
       statusCode: 200,

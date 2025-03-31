@@ -4,6 +4,7 @@ import express, {
   Response as ExResponse,
   Request as ExRequest,
   NextFunction,
+  static as expressStatic,
 } from "express";
 // Explanation: This line intentionally causes an error because...
 // @ts-ignore
@@ -12,7 +13,7 @@ import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 import { TUser } from "./utils/interfaces/common";
 import AppError, { ValidationError } from "./utils/error";
-
+import path from "path";
 declare module "express" {
   interface Request {
     user?: TUser;
@@ -29,6 +30,8 @@ app.use(
 
 app.use(json());
 app.use(cors());
+// Serve uploaded videos statically (if storing locally)
+app.use("/uploads", expressStatic(path.join(__dirname, "../uploads")));
 app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
   return res.send(
     //@ts-ignore

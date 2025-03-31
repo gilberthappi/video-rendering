@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id                 Int            @id @default(autoincrement())
+  id                 String   @id @default(uuid())
   email              String         @unique
   password           String
   firstName          String
@@ -19,13 +19,16 @@ model User {
   otpExpiresAt       DateTime? 
   photo              String         @default("https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg")
   roles              UserRoles[]
+  video              Video[]
+  @@index([email])
 }
 
 model UserRoles {
-  id     Int  @id @default(autoincrement())
-  userId Int
+  id     String   @id @default(uuid())
+  userId String
   role   Role
   user   User @relation(fields: [userId], references: [id])
+  @@index([userId])
 }
 
 
@@ -36,9 +39,39 @@ enum Role {
 }
 
 model Faq {
-  id                      Int           @id @default(autoincrement())
+  id                      String   @id @default(uuid())
   question                String
   solution                String
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  thumbnail   String?
+  duration    Int?
+  width       Int?
+  height      Int?
+  format      String?
+  size        Int? 
+  status      VideoStatus @default(UPLOADED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User @relation(fields: [userId], references: [id])
+  metadata    Json?
+  @@index([userId])
+  @@index([status])
+}
+
+enum VideoStatus {
+  UPLOADED
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  QUEUED
 }

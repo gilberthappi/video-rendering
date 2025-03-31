@@ -13,7 +13,8 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: () => ({
     public_id: v4(),
-    folder: "group8",
+    folder: "group8/videos",
+    resource_type: "video",
   }),
 });
 

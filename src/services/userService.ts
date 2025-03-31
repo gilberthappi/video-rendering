@@ -195,7 +195,7 @@ export class UserService {
 
     return { message: "Password reset successfully" };
   }
-  public static async deleteUser(id: number) {
+  public static async deleteUser(id: string) {
     try {
       // Check if the user exists and include related records
       const user = await prisma.user.findUnique({

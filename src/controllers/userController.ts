@@ -28,7 +28,7 @@ export class UserController {
   @Security("jwt")
   @Middlewares(loggerMiddleware)
   public deleteUser(@Path() id: string) {
-    return UserService.deleteUser(Number.parseInt(id));
+    return UserService.deleteUser(id);
   }
   @Post("/request-password-reset")
   public async requestPasswordReset(@Body() body: { email: string }) {

@@ -22,7 +22,7 @@ export class FaqService extends BaseService {
     }
   }
 
-  public static async getFaq(faqId: number): Promise<IResponse<TFaq>> {
+  public static async getFaq(faqId: string): Promise<IResponse<TFaq>> {
     try {
       const faq = await prisma.faq.findUnique({
         where: {
@@ -58,7 +58,7 @@ export class FaqService extends BaseService {
   }
 
   public static async updateFaq(
-    faqId: number,
+    faqId: string,
     faqData: Partial<CreateFaqDto>,
   ): Promise<IResponse<TFaq>> {
     try {
@@ -78,7 +78,7 @@ export class FaqService extends BaseService {
     }
   }
 
-  public static async deleteFaq(faqId: number): Promise<IResponse<null>> {
+  public static async deleteFaq(faqId: string): Promise<IResponse<null>> {
     try {
       await prisma.faq.delete({ where: { id: faqId } });
       return {

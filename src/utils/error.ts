@@ -11,7 +11,7 @@ class AppError extends Error {
     Object.setPrototypeOf(this, AppError.prototype);
   }
 }
-
+export default AppError;
 export interface IValidationError {
   field: string;
   error: string;
@@ -23,4 +23,13 @@ export class ValidationError extends Error {
   }
 }
 
-export default AppError;
+export class VideoProcessingError extends AppError {
+  constructor(
+    message: string,
+    public readonly videoId: string,
+    public readonly metadata?: Record<string, unknown>,
+  ) {
+    super(message, 500);
+    Object.setPrototypeOf(this, VideoProcessingError.prototype);
+  }
+}

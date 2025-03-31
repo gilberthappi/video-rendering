@@ -1,5 +1,9 @@
 import type { $Enums } from "@prisma/client";
 import { TsoaResponse } from "tsoa";
+import { VideoStatus, Role } from "@prisma/client";
+
+export type VideoStatusT = keyof typeof VideoStatus;
+export type UserRoleT = keyof typeof Role;
 export interface IResponse<T> {
   statusCode: number;
   message: string;
@@ -8,7 +12,7 @@ export interface IResponse<T> {
 }
 
 export type TUser = {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -16,11 +20,10 @@ export type TUser = {
   photo?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
-  roles?: { id: number; role: string; userId: number }[];
-  company?: { id: number; role: string; userId: number; companyId: number };
+  roles?: { id: string; role: string; userId: string }[];
 };
 
-export type RoleT = "ADMIN" | "CLIENT" | "CLIENT";
+export type RoleT = "ADMIN" | "GUEST" | "CLIENT";
 
 export interface IUser extends Omit<TUser, "id" | "createdAt" | "updatedAt"> {}
 export interface ILoginResponse
@@ -47,7 +50,7 @@ export interface IResponse<T> {
 }
 
 export type TFaq = {
-  id: number;
+  id: string;
   question: string;
   solution: string;
   createdAt: Date;
@@ -57,4 +60,61 @@ export type TFaq = {
 export interface CreateFaqDto {
   question: string;
   solution: string;
+}
+
+export type TVideo = {
+  id: string;
+  title: string;
+  description?: string | null;
+  thumbnail?: string | null;
+  url: string;
+  duration?: number | null;
+  width?: number | null;
+  height?: number | null;
+  format?: string | null;
+  size?: number | null;
+  status: "UPLOADED" | "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+};
+
+export interface IVideo {
+  id: string;
+  title: string;
+  description?: string | null;
+  thumbnail?: Express.Multer.File | string | null;
+  url: Express.Multer.File | string;
+  duration?: number | null;
+  width?: number | null;
+  height?: number | null;
+  format?: string | null;
+  size?: number | null;
+  status: VideoStatusT;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  metadata?: Record<string, unknown> | null;
+}
+
+export interface CreateVideoDto {
+  title: string;
+  description?: string;
+  thumbnail?: Express.Multer.File | string;
+  url: Express.Multer.File | string;
+  userId: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UpdateVideoDto extends Partial<CreateVideoDto> {
+  status?: VideoStatusT;
+  processingError?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
