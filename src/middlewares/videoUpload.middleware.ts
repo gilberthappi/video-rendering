@@ -1,73 +1,82 @@
-import multer from "multer";
-import { v4 as uuidv4 } from "uuid";
-import path from "path";
-import fs from "fs";
-import { Request, Response, NextFunction } from "express";
-import AppError from "../utils/error";
+import type { NextFunction } from "express";
+import type { Request, Response } from "express";
 
-const videoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = process.env.VIDEO_UPLOAD_DIR || "./uploads/videos";
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
-
-export const videoUpload = multer({
-  storage: videoStorage,
-  limits: {
-    fileSize: 1024 * 1024 * 500, // 500MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const validMimeTypes = [
-      "video/mp4",
-      "video/quicktime",
-      "video/x-msvideo",
-      "video/x-matroska",
-    ];
-
-    if (validMimeTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid video file type"));
-    }
-  },
-});
-
-export const processVideoUpload = videoUpload.fields([
-  { name: "video", maxCount: 1 },
-  { name: "thumbnail", maxCount: 1 },
-]);
-
-export const handleVideoUpload = async (
+export const appendPhotoAttachments = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    if (!req.files) {
-      throw new AppError("No files uploaded", 400);
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+
+      // Handle thumbnail
+      if (
+        !req.body.thumbnail &&
+        files.some((file) => file.fieldname === "thumbnail")
+      ) {
+        req.body.thumbnail = files.find(
+          (file) => file.fieldname === "thumbnail",
+        )?.path;
+      }
+
+      // Handle video URL
+      if (!req.body.url && files.some((file) => file.fieldname === "url")) {
+        req.body.url = files.find((file) => file.fieldname === "url")?.path;
+      }
+
+      // Handle galleryImages
+      const galleryFiles = files.filter(
+        (file) => file.fieldname === "galleryImages",
+      );
+      if (galleryFiles.length > 0) {
+        req.body.galleryImages = galleryFiles.map((file) => file.path);
+      }
     }
 
-    const files = req.files as Record<string, Express.Multer.File[]>;
-
-    if (!files.video?.[0]) {
-      throw new AppError("Video file is required", 400);
+    // Ensure thumbnail and url fields can accept URLs directly
+    if (req.body.thumbnail && typeof req.body.thumbnail !== "string") {
+      throw new Error("Invalid thumbnail format");
+    }
+    if (req.body.url && typeof req.body.url !== "string") {
+      throw new Error("Invalid URL format");
     }
 
-    req.body.video = {
-      url: files.video[0].path,
-      ...(files.thumbnail?.[0] && { thumbnail: files.thumbnail[0].path }),
-    };
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
+export const appendPhoto = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      // Ensure the photo field is correctly extracted
+      const photoFile = files.find((file) => file.fieldname === "photo");
+      if (photoFile) {
+        req.body.photo = photoFile.path;
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const appendImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
     next();
   } catch (error) {
     next(error);

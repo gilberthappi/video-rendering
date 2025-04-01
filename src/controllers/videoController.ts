@@ -20,15 +20,10 @@ import { CreateVideoDto } from "../utils/interfaces/common";
 import type {
   IVideo,
   PaginatedResponse,
-  TUser,
+  // TUser,
 } from "../utils/interfaces/common";
 import upload from "../utils/cloudinary";
-
-import {
-  processVideoUpload,
-  handleVideoUpload,
-} from "../middlewares/videoUpload.middleware";
-import { Prisma } from "@prisma/client";
+import { appendPhotoAttachments } from "../middlewares/videoUpload.middleware";
 @Tags("Video Processing")
 @Route("videos")
 export class VideoController {
@@ -38,13 +33,8 @@ export class VideoController {
    * @param req Express request with uploaded files
    */
   @Post("/")
-  @Security("jwt")
-  @Middlewares(
-    upload.any(),
-    loggerMiddleware,
-    processVideoUpload,
-    handleVideoUpload,
-  )
+  // @Security("jwt")
+  @Middlewares(upload.any(), loggerMiddleware, appendPhotoAttachments)
   @Response<IVideo>(201, "Video uploaded successfully")
   @Response<{ error: string }>(
     400,
@@ -56,12 +46,9 @@ export class VideoController {
     @Body() videoData: CreateVideoDto,
     @Request() req: ExpressRequest,
   ): Promise<IVideo> {
-    const user = req.user as TUser;
-    return VideoService.createVideo(user.id, {
-      ...videoData,
-      url: req.body.video.url,
-      thumbnail: req.body.video.thumbnail,
-    });
+    // const user = req.user as TUser;
+    const userId = "6a61cdf4-728f-4ace-a15d-32c7cd7806ac";
+    return VideoService.createVideo(userId, videoData);
   }
 
   /**
@@ -98,8 +85,8 @@ export class VideoController {
   @Response<{ error: string }>(500, "Internal Server Error")
   public async updateStatus(
     @Path() id: string,
-    @Body() body: { status: VideoStatus; metadata?: Prisma.InputJsonValue },
+    @Body() body: { status: VideoStatus },
   ): Promise<IVideo> {
-    return VideoService.updateVideoStatus(id, body.status, body.metadata);
+    return VideoService.updateVideoStatus(id, body.status);
   }
 }

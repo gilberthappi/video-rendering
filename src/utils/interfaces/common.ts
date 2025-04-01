@@ -1,4 +1,4 @@
-import type { $Enums, Prisma } from "@prisma/client";
+import type { $Enums } from "@prisma/client";
 import { TsoaResponse } from "tsoa";
 import { VideoStatus, Role } from "@prisma/client";
 
@@ -68,11 +68,6 @@ export type TVideo = {
   description?: string | null;
   thumbnail?: string | null;
   url: string;
-  duration?: number | null;
-  width?: number | null;
-  height?: number | null;
-  format?: string | null;
-  size?: number | null;
   status: "UPLOADED" | "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
   createdAt: Date;
   updatedAt: Date;
@@ -85,16 +80,10 @@ export interface IVideo {
   description?: string | null;
   thumbnail?: Express.Multer.File | string | null;
   url: Express.Multer.File | string;
-  duration?: number | null;
-  width?: number | null;
-  height?: number | null;
-  format?: string | null;
-  size?: number | null;
   status: VideoStatusT;
   createdAt: Date;
   updatedAt: Date;
   userId: string;
-  metadata?: Prisma.JsonValue | null;
 }
 
 export interface CreateVideoDto {
@@ -103,7 +92,6 @@ export interface CreateVideoDto {
   thumbnail?: Express.Multer.File | string;
   url: Express.Multer.File | string;
   userId: string;
-  metadata?: Prisma.InputJsonValue;
 }
 
 export interface UpdateVideoDto extends Partial<CreateVideoDto> {
