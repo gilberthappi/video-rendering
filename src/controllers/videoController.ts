@@ -20,7 +20,7 @@ import { CreateVideoDto } from "../utils/interfaces/common";
 import type {
   IVideo,
   PaginatedResponse,
-  // TUser,
+  TUser,
 } from "../utils/interfaces/common";
 import upload from "../utils/cloudinary";
 import { appendPhotoAttachments } from "../middlewares/videoUpload.middleware";
@@ -33,7 +33,7 @@ export class VideoController {
    * @param req Express request with uploaded files
    */
   @Post("/")
-  // @Security("jwt")
+  @Security("jwt")
   @Middlewares(upload.any(), loggerMiddleware, appendPhotoAttachments)
   @Response<IVideo>(201, "Video uploaded successfully")
   @Response<{ error: string }>(
@@ -46,9 +46,8 @@ export class VideoController {
     @Body() videoData: CreateVideoDto,
     @Request() req: ExpressRequest,
   ): Promise<IVideo> {
-    // const user = req.user as TUser;
-    const userId = "6a61cdf4-728f-4ace-a15d-32c7cd7806ac";
-    return VideoService.createVideo(userId, videoData);
+    const user = req.user as TUser;
+    return VideoService.createVideo(user.id, videoData);
   }
 
   /**

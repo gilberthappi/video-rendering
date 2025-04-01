@@ -91,7 +91,6 @@ export interface CreateVideoDto {
   description?: string;
   thumbnail?: Express.Multer.File | string;
   url: Express.Multer.File | string;
-  userId: string;
 }
 
 export interface UpdateVideoDto extends Partial<CreateVideoDto> {
